@@ -1,12 +1,14 @@
 package Entity.NPC;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+
 import Entity.Monster;
 import Entity.MonsterHandler;
 import Entity.Player;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.awt.Font;
 import Event.DialogueEvent;
 import Main.KeyHandler;
 
@@ -14,7 +16,7 @@ public class NPCHandler {
     private ArrayList<NPC> npcs;
     private Player player;
     private KeyHandler keyH;
-    private DialogueEvent dialogueEvent;
+    public DialogueEvent dialogueEvent;
     private String currentDialogue = "";
     private MonsterHandler monsterHandler;
 

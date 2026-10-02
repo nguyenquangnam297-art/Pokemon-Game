@@ -44,6 +44,9 @@ public class Player extends Entity {
         }
     }
     public void update(){  
+        if(gp.npcHandler.dialogueEvent != null && gp.npcHandler.dialogueEvent.isActive()){
+            return;
+        }
         if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
             if(keyH.upPressed){
             direction = "up";

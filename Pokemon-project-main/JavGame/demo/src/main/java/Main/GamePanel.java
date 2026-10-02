@@ -32,7 +32,7 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     Player player = new Player(this, keyH);
     MonsterHandler monsterHandler = new MonsterHandler();
-    NPCHandler npcHandler = new NPCHandler(player, keyH, monsterHandler);
+    public NPCHandler npcHandler = new NPCHandler(player, keyH, monsterHandler);
     //vung co
     GrassEvent grassEvent = new GrassEvent(
             200,
