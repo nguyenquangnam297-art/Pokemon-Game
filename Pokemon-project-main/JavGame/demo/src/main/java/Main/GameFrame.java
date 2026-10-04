@@ -1,17 +1,32 @@
 package Main;
 
-import javax.swing.JFrame;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-public class GameFrame extends JFrame {
-    public GameFrame(){
-        setTitle("Game");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
-        GamePanel panel = new GamePanel();
-        add(panel);
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
-        panel.startGameThread();
+public class GameFrame extends Application {
+    private GamePanel gamePanel;
+
+    @Override
+    public void start(Stage stage) {
+        gamePanel = new GamePanel();
+        Scene scene = new Scene(new Group(gamePanel), gamePanel.screenWidth, gamePanel.screenHeight);
+        gamePanel.attachInput(scene);
+
+        stage.setTitle("Game");
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
+
+        gamePanel.requestFocus();
+        gamePanel.startGameLoop();
+    }
+
+    @Override
+    public void stop() {
+        if (gamePanel != null) {
+            gamePanel.stopGameLoop();
+        }
     }
 }

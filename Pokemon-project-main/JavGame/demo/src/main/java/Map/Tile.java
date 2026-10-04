@@ -1,8 +1,8 @@
 package Map;
 
-import java.awt.image.BufferedImage;
+import javafx.scene.image.Image;
 
 public class Tile {
-    BufferedImage image;
+    Image image;
     boolean collision = false;
 }

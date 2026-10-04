@@ -2,9 +2,8 @@ package Entity.NPC;
 
 import Entity.Entity;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import java.util.ArrayList;
 
 public class NPC extends Entity {
@@ -39,28 +38,28 @@ public class NPC extends Entity {
     }
     private void getNPCImage(String spriteName) {
         try {
-            frames = new BufferedImage[4];
+            frames = new Image[4];
 
-            frames[0] = ImageIO.read(
-                    getClass().getResourceAsStream("/NPCSprite/" + spriteName + "_down.png")
-            );
+            frames[0] = loadImage("/NPCSprite/" + spriteName + "_down.png");
 
-            frames[1] = ImageIO.read(
-                    getClass().getResourceAsStream("/NPCSprite/" + spriteName + "_up.png")
-            );
+            frames[1] = loadImage("/NPCSprite/" + spriteName + "_up.png");
 
-            frames[2] = ImageIO.read(
-                    getClass().getResourceAsStream("/NPCSprite/" +  spriteName + "_left.png")
-            );
-            frames[3] = ImageIO.read(
-                    getClass().getResourceAsStream("/NPCSprite/" +  spriteName + "_right.png")
-            );
+            frames[2] = loadImage("/NPCSprite/" + spriteName + "_left.png");
+            frames[3] = loadImage("/NPCSprite/" + spriteName + "_right.png");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public void draw(Graphics2D g2, int tileSize) {
-        BufferedImage image = null;
+    private Image loadImage(String resourcePath) {
+        var resource = getClass().getResource(resourcePath);
+        if (resource == null) {
+            throw new IllegalStateException("Missing NPC sprite: " + resourcePath);
+        }
+        return new Image(resource.toExternalForm());
+    }
+
+    public void draw(GraphicsContext graphics, int tileSize) {
+        Image image = null;
 
         switch (direction) {
             case "down":
@@ -80,6 +79,6 @@ public class NPC extends Entity {
                 break;
         }
 
-        g2.drawImage(image, x, y, tileSize, tileSize, null);
+        graphics.drawImage(image, x, y, tileSize, tileSize);
     }
 }

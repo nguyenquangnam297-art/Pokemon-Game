@@ -1,9 +1,9 @@
 package Entity;
 
-import java.awt.image.BufferedImage;
-
 import Main.GamePanel;
 import Main.KeyHandler;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 public class Player extends Entity {
     GamePanel gp;
@@ -25,19 +25,19 @@ public class Player extends Entity {
     }
     private void getPlayerImage(){
         try{
-            frames = new java.awt.image.BufferedImage[12];
-            frames[0] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/left1.png"));
-            frames[1] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/left2.png"));
-            frames[2] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/left3.png"));
-            frames[3] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/right1.png"));
-            frames[4] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/right2.png"));
-            frames[5] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/right3.png"));
-            frames[6] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/up1.png"));
-            frames[7] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/up2.png"));
-            frames[8] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/up3.png"));
-            frames[9] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/down1.png"));
-            frames[10] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/down2.png"));
-            frames[11] = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/PlayerSprite/down3.png"));
+            frames = new Image[12];
+            frames[0] = loadImage("/PlayerSprite/left1.png");
+            frames[1] = loadImage("/PlayerSprite/left2.png");
+            frames[2] = loadImage("/PlayerSprite/left3.png");
+            frames[3] = loadImage("/PlayerSprite/right1.png");
+            frames[4] = loadImage("/PlayerSprite/right2.png");
+            frames[5] = loadImage("/PlayerSprite/right3.png");
+            frames[6] = loadImage("/PlayerSprite/up1.png");
+            frames[7] = loadImage("/PlayerSprite/up2.png");
+            frames[8] = loadImage("/PlayerSprite/up3.png");
+            frames[9] = loadImage("/PlayerSprite/down1.png");
+            frames[10] = loadImage("/PlayerSprite/down2.png");
+            frames[11] = loadImage("/PlayerSprite/down3.png");
         }
         catch(Exception e){
             e.printStackTrace();
@@ -49,8 +49,8 @@ public class Player extends Entity {
         }
         if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
             if(keyH.upPressed){
-            direction = "up";
-            y -= speed;
+                direction = "up";
+                y -= speed;
             }
             if(keyH.downPressed){
                 direction = "down";
@@ -74,8 +74,16 @@ public class Player extends Entity {
             }
         }
     }
-    public void draw(java.awt.Graphics2D g2){
-        BufferedImage image = null;
+    private Image loadImage(String resourcePath) {
+        var resource = getClass().getResource(resourcePath);
+        if (resource == null) {
+            throw new IllegalStateException("Missing player sprite: " + resourcePath);
+        }
+        return new Image(resource.toExternalForm());
+    }
+
+    public void draw(GraphicsContext graphics){
+        Image image = null;
         if(direction.equals("up")){
             switch (state) {
                 case 0 -> {
@@ -116,6 +124,6 @@ public class Player extends Entity {
                 case 2 -> image = frames[5];
             }
         }
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        graphics.drawImage(image, x, y, gp.tileSize, gp.tileSize);
     }
 }

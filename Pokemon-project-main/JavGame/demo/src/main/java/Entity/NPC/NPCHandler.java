@@ -1,9 +1,5 @@
 package Entity.NPC;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import Entity.Monster;
@@ -11,6 +7,10 @@ import Entity.MonsterHandler;
 import Entity.Player;
 import Event.DialogueEvent;
 import Main.KeyHandler;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 public class NPCHandler {
     private ArrayList<NPC> npcs;
@@ -70,18 +70,16 @@ public class NPCHandler {
         return null;
     }
 
-    public void draw(Graphics2D g2, int tileSize) {
+    public void draw(GraphicsContext graphics, int tileSize) {
         for(NPC npc : npcs) {
             if (isPlayerNearNPC(npc)) {
                 updateNPCDirection(npc);
             }
-            npc.draw(g2, tileSize);
+            npc.draw(graphics, tileSize);
         }
-        drawDialogueBox(g2);
+        drawDialogueBox(graphics);
     }
-    private void drawDialogueText(Graphics2D g2) {
-        FontMetrics fm = g2.getFontMetrics();
-
+    private void drawDialogueText(GraphicsContext graphics) {
         int x = 40;
         int y = 495;
 
@@ -91,52 +89,41 @@ public class NPCHandler {
         String line = "";
 
         for (String word : words) {
-
-            String testLine = line + word + " ";
-
-            if (fm.stringWidth(testLine) > maxWidth) {
-                g2.drawString(line, x, y);
-
-                line = word + " ";
+            String testLine = line.isEmpty() ? word : line + " " + word;
+            Text measuredText = new Text(testLine);
+            measuredText.setFont(graphics.getFont());
+            if (measuredText.getLayoutBounds().getWidth() > maxWidth) {
+                graphics.fillText(line, x, y);
+                line = word;
                 y += 25;
             } else {
                 line = testLine;
             }
         }
 
-        g2.drawString(line, x, y);
+        graphics.fillText(line, x, y);
     }
-    private void drawDialogueBox(Graphics2D g2) {
+    private void drawDialogueBox(GraphicsContext graphics) {
         if (currentDialogue == null || currentDialogue.isEmpty()) {
             return;
         }
 
-        // Lưu trạng thái đồ họa hiện tại
-        Color oldColor = g2.getColor();
-        Font oldFont = g2.getFont();
+        graphics.save();
+        graphics.setFill(Color.BLACK);
+        graphics.fillRoundRect(20, 430, 728, 120, 20, 20);
 
-        // Vẽ khung hội thoại
-        g2.setColor(Color.BLACK);
-        g2.fillRoundRect(20, 430, 728, 120, 20, 20);
+        graphics.setStroke(Color.WHITE);
+        graphics.strokeRoundRect(20, 430, 728, 120, 20, 20);
 
-        // Vẽ viền trắng
-        g2.setColor(Color.WHITE);
-        g2.drawRoundRect(20, 430, 728, 120, 20, 20);
+        graphics.setFill(Color.WHITE);
+        graphics.setFont(Font.font("Arial", 18));
+        graphics.fillText(dialogueEvent.getNpc().getName(), 40, 460);
 
-        // Vẽ tên NPC
-        g2.setFont(new Font("Arial", Font.BOLD, 18));
-        g2.drawString(dialogueEvent.getNpc().getName(), 40, 460);
+        graphics.setFont(Font.font("Arial", 16));
+        drawDialogueText(graphics);
 
-        // Vẽ nội dung hội thoại
-        g2.setFont(new Font("Arial", Font.PLAIN, 16));
-        drawDialogueText(g2);
-
-        // Gợi ý phím đóng hội thoại
-        g2.drawString("Nhan [F] - tiep tuc", 610, 530);
-
-        // Khôi phục trạng thái đồ họa
-        g2.setColor(oldColor);
-        g2.setFont(oldFont);
+        graphics.fillText("Nhan [F] - tiep tuc", 610, 530);
+        graphics.restore();
     }
     private boolean isPlayerNearNPC(NPC npc) {
         int dx = player.x - npc.x;

@@ -1,12 +1,12 @@
 package Entity;
 
-import java.awt.image.BufferedImage;
+import javafx.scene.image.Image;
 
 public class Entity {
     public int x, y;
     public int speed;
 
-    public BufferedImage[] frames;
+    public Image[] frames;
     public String direction;
     public int state;
     public int spriteCounter;

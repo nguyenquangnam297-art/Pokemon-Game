@@ -1,17 +1,15 @@
 package Map;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import Main.GamePanel;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 
 public class TileHandler {
     GamePanel gp;
@@ -26,15 +24,16 @@ public class TileHandler {
     }
 
     public void getTiles() {
-        try {
-            BufferedImage bigCanvas = ImageIO.read(getClass().getResourceAsStream("/TileSprite/OverWorld.png"));
-            tile[0] = new Tile();
-            tile[0].image = bigCanvas.getSubimage(0, 0, gp.tileSize /3 , gp.tileSize / 3);
-            tile[1] = new Tile();
-            tile[1].image = bigCanvas.getSubimage(0, 1 * gp.tileSize / 3, gp.tileSize / 3, gp.tileSize / 3);
-        } catch (IOException e) {
-            e.printStackTrace();
+        var resource = getClass().getResource("/TileSprite/OverWorld.png");
+        if (resource == null) {
+            throw new IllegalStateException("Missing tile sprite: /TileSprite/OverWorld.png");
         }
+        Image spriteSheet = new Image(resource.toExternalForm());
+        int sourceTileSize = gp.tileSize / 3;
+        tile[0] = new Tile();
+        tile[0].image = new WritableImage(spriteSheet.getPixelReader(), 0, 0, sourceTileSize, sourceTileSize);
+        tile[1] = new Tile();
+        tile[1].image = new WritableImage(spriteSheet.getPixelReader(), 0, sourceTileSize, sourceTileSize, sourceTileSize);
     }
 
     public void loadMap() {
@@ -64,7 +63,7 @@ public class TileHandler {
         }
     }
 
-    public void draw(Graphics2D g2) {
+    public void draw(GraphicsContext graphics) {
         if (mapTileNum == null) {
             return;
         }
@@ -73,7 +72,7 @@ public class TileHandler {
             for (int col = 0; col < mapTileNum[row].length; col++) {
                 int tileNum = mapTileNum[row][col];
                 if (tileNum >= 0 && tileNum < tile.length && tile[tileNum] != null) {
-                    g2.drawImage(tile[tileNum].image, col * gp.tileSize, row * gp.tileSize, gp.tileSize, gp.tileSize, null);
+                    graphics.drawImage(tile[tileNum].image, col * gp.tileSize, row * gp.tileSize, gp.tileSize, gp.tileSize);
                 }
             }
         }
