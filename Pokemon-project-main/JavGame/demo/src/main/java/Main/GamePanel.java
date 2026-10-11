@@ -3,7 +3,7 @@ package Main;
 import Entity.MonsterHandler;
 import Entity.NPC.NPCHandler;
 import Entity.Player;
-import Event.GrassEvent;
+import Event.EventHandler;
 import Map.TileHandler;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
@@ -30,15 +30,8 @@ public class GamePanel extends Canvas {
     Player player = new Player(this, keyH);
     MonsterHandler monsterHandler = new MonsterHandler();
     public NPCHandler npcHandler = new NPCHandler(player, keyH, monsterHandler);
-    //vung co
-    GrassEvent grassEvent = new GrassEvent(
-            200,
-            200,
-            150,
-            100,
-            1,
-            monsterHandler.getAllMonsters()
-    );
+    EventHandler eventHandler = new EventHandler(player, monsterHandler);
+
     private final AnimationTimer gameLoop;
     private long previousFrameTime;
     private long accumulatedTime;
@@ -47,9 +40,6 @@ public class GamePanel extends Canvas {
     public GamePanel(){
         super(SCREEN_WIDTH, SCREEN_HEIGHT);
         setFocusTraversable(true);
-
-        //temp
-        grassEvent.setPlayer(player);
 
         gameLoop = new AnimationTimer() {
             @Override
@@ -86,8 +76,7 @@ public class GamePanel extends Canvas {
     public void update(){
         player.update();
         npcHandler.update();
-        //temp
-        grassEvent.update();
+        eventHandler.update();
     }
 
     private void render() {
@@ -97,17 +86,7 @@ public class GamePanel extends Canvas {
         graphics.setFill(Color.WHITE);
         graphics.fillRect(0, 0, screenWidth, screenHeight);
         tileH.draw(graphics);
-
-        //temp
-        graphics.setFill(Color.GREEN);
-        graphics.fillRect(
-            grassEvent.getX(),
-            grassEvent.getY(),
-            grassEvent.getWidth(),
-            grassEvent.getHeight()
-        );
-
-
+        eventHandler.draw(graphics);
         player.draw(graphics);
         npcHandler.draw(graphics, tileSize);
     }
