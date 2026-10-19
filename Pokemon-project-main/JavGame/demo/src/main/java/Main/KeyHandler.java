@@ -6,6 +6,7 @@ import javafx.scene.input.KeyCode;
 public class KeyHandler {
     public boolean upPressed, downPressed, leftPressed, rightPressed;
     public boolean fPressed;
+    public boolean enterPressed, escapePressed;
 
     public void attachTo(Scene scene) {
         scene.setOnKeyPressed(event -> setPressed(event.getCode(), true));
@@ -19,6 +20,8 @@ public class KeyHandler {
             case S -> downPressed = pressed;
             case D -> rightPressed = pressed;
             case F -> fPressed = pressed;
+            case ENTER, SPACE -> enterPressed = pressed;
+            case ESCAPE, E -> escapePressed = pressed;
             default -> {
             }
         }

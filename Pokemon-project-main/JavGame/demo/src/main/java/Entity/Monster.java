@@ -1,9 +1,12 @@
 package Entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import Battle.Skills.Skill;
 
-public class Monster extends Entity {
+public class Monster extends Entity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private int level;
 

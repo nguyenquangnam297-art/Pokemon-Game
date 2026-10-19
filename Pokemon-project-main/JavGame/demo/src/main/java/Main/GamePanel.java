@@ -1,5 +1,6 @@
 package Main;
 
+import Data.PlayerData;
 import Entity.MonsterHandler;
 import Entity.NPC.NPCHandler;
 import Entity.Player;
@@ -24,6 +25,12 @@ public class GamePanel extends Canvas {
     public final int screenWidth = SCREEN_WIDTH;
     public final int screenHeight = SCREEN_HEIGHT;
 
+    public final int playState = 0;
+    public final int menuState = 1;
+    public int gameState = playState;
+
+    public PlayerData playerData = new PlayerData();
+    MenuUI menuUI = new MenuUI(this);
 
     KeyHandler keyH = new KeyHandler();
     TileHandler tileH = new TileHandler(this);
@@ -74,9 +81,19 @@ public class GamePanel extends Canvas {
     }
 
     public void update(){
-        player.update();
-        npcHandler.update();
-        eventHandler.update();
+        if(gameState == playState){
+            if (keyH.escapePressed) {
+                keyH.escapePressed = false;
+                gameState = menuState;
+                return;
+            }
+            player.update();  
+            npcHandler.update();
+            eventHandler.update();
+        }
+        else if(gameState == menuState){
+            menuUI.update();
+        }
     }
 
     private void render() {
@@ -89,5 +106,6 @@ public class GamePanel extends Canvas {
         eventHandler.draw(graphics);
         player.draw(graphics);
         npcHandler.draw(graphics, tileSize);
+        if (gameState == menuState) menuUI.draw(graphics);
     }
 }
