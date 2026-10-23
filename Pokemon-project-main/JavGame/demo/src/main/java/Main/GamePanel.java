@@ -1,16 +1,20 @@
 package Main;
 
 import Data.PlayerData;
+import Entity.Monster;
 import Entity.MonsterHandler;
 import Entity.NPC.NPCHandler;
 import Entity.Player;
 import Event.EventHandler;
+import Event.WildBattleEvent;
 import Map.TileHandler;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class GamePanel extends Canvas {
     private static final int ORIGINAL_TILE_SIZE = 16;
@@ -37,9 +41,11 @@ public class GamePanel extends Canvas {
     Player player = new Player(this, keyH);
     MonsterHandler monsterHandler = new MonsterHandler();
     public NPCHandler npcHandler = new NPCHandler(player, keyH, monsterHandler);
-    EventHandler eventHandler = new EventHandler(player, monsterHandler);
+    private final EventHandler eventHandler;
 
     private final AnimationTimer gameLoop;
+    private Consumer<WildBattleEvent> battleLauncher;
+    private boolean battleActive;
     private long previousFrameTime;
     private long accumulatedTime;
     private static final long FRAME_INTERVAL = 1_000_000_000L / 60;
@@ -47,6 +53,7 @@ public class GamePanel extends Canvas {
     public GamePanel(){
         super(SCREEN_WIDTH, SCREEN_HEIGHT);
         setFocusTraversable(true);
+        eventHandler = new EventHandler(player, monsterHandler, this::beginWildBattle);
 
         gameLoop = new AnimationTimer() {
             @Override
@@ -80,7 +87,34 @@ public class GamePanel extends Canvas {
         keyH.attachTo(scene);
     }
 
+    public void setBattleLauncher(Consumer<WildBattleEvent> battleLauncher) {
+        this.battleLauncher = Objects.requireNonNull(battleLauncher);
+    }
+
+    public Monster createBattlePlayerMonster() {
+        return monsterHandler.getMonsterByName("Pikachu").copyForBattle();
+    }
+
+    public void resumeAfterBattle() {
+        keyH.clearPressedKeys();
+        battleActive = false;
+        startGameLoop();
+    }
+
+    private void beginWildBattle(WildBattleEvent wildBattle) {
+        if (battleLauncher == null) {
+            throw new IllegalStateException("Battle launcher has not been configured");
+        }
+        battleActive = true;
+        keyH.clearPressedKeys();
+        stopGameLoop();
+        battleLauncher.accept(wildBattle);
+    }
+
     public void update(){
+        if (battleActive) {
+            return;
+        }
         if(gameState == playState){
             if (keyH.escapePressed) {
                 keyH.escapePressed = false;

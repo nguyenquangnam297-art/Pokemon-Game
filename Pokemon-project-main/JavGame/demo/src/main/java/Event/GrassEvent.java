@@ -2,6 +2,7 @@ package Event;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import Entity.Monster;
 import Entity.Player;
@@ -18,8 +19,17 @@ public class GrassEvent extends Event {
     private int encounterCooldown = 0;
     private WildBattleEvent currentWildBattle = null;
     private Player player = null;
+    private final Consumer<WildBattleEvent> onBattleStarted;
 
-    public GrassEvent(int x, int y, int width, int height, double encounterRate,  ArrayList<Monster> wildMonsters) {
+    public GrassEvent(
+            int x,
+            int y,
+            int width,
+            int height,
+            double encounterRate,
+            ArrayList<Monster> wildMonsters,
+            Consumer<WildBattleEvent> onBattleStarted
+    ) {
         super();
         this.x = x;
         this.y = y;
@@ -28,6 +38,7 @@ public class GrassEvent extends Event {
         this.encounterRate = encounterRate;
         this.wildMonsters = new ArrayList<>();
         this.wildMonsters.addAll(wildMonsters);
+        this.onBattleStarted = onBattleStarted;
     }
     public int getX() {
         return x;
@@ -73,7 +84,7 @@ public class GrassEvent extends Event {
         }
         Random rd = new Random();
         int i = rd.nextInt(wildMonsters.size());
-        return wildMonsters.get(i);
+        return wildMonsters.get(i).copyForBattle();
     }
 
     
@@ -113,6 +124,7 @@ public class GrassEvent extends Event {
 
                             // Bắt đầu event
                             currentWildBattle.startBattle();
+                            onBattleStarted.accept(currentWildBattle);
 
                             // In ra để kiểm tra
                             System.out.println(
@@ -121,8 +133,8 @@ public class GrassEvent extends Event {
                                             + " appeared!"
                             );
 
-                            // Chờ khoảng 1 giây
-                            encounterCooldown = 60;
+                            // Chờ khoảng 60 giây trước khi có thể gặp Pokémon tiếp theo
+                            encounterCooldown = 3600;
                         }
                     }
                 }

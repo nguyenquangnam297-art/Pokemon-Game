@@ -1,35 +1,17 @@
 package Battle.Skills;
 
-import java.io.Serializable;
-
-public class Skill implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class Skill {
     private String name;
-    private int power;
-    private int accuracy;
-    private String description;
+    private int basePower;
+    private String type;
 
-    public Skill(String name, int power, int accuracy, String description) {
+    public Skill(String name, int basePower, String type) {
         this.name = name;
-        this.power = power;
-        this.accuracy = accuracy;
-        this.description = description;
+        this.basePower = basePower;
+        this.type = type;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getPower() {
-        return power;
-    }
-
-    public int getAccuracy() {
-        return accuracy;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    public String getName() { return name; }
+    public int getBasePower() { return basePower; }
+    public String getType() { return type; }
 }

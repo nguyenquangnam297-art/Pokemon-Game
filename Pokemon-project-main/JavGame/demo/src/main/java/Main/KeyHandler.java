@@ -13,6 +13,16 @@ public class KeyHandler {
         scene.setOnKeyReleased(event -> setPressed(event.getCode(), false));
     }
 
+    public void clearPressedKeys() {
+        upPressed = false;
+        downPressed = false;
+        leftPressed = false;
+        rightPressed = false;
+        fPressed = false;
+        enterPressed = false;
+        escapePressed = false;
+    }
+
     private void setPressed(KeyCode code, boolean pressed) {
         switch (code) {
             case W -> upPressed = pressed;

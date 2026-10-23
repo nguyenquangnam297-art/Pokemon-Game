@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Entity.MonsterHandler;
 import Entity.Player;
+import java.util.function.Consumer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -11,10 +12,16 @@ public class EventHandler {
     private final Player player;
     private final MonsterHandler monsterHandler;
     private final ArrayList<GrassEvent> grassEvents;
+    private final Consumer<WildBattleEvent> onBattleStarted;
 
-    public EventHandler(Player player, MonsterHandler monsterHandler) {
+    public EventHandler(
+            Player player,
+            MonsterHandler monsterHandler,
+            Consumer<WildBattleEvent> onBattleStarted
+    ) {
         this.player = player;
         this.monsterHandler = monsterHandler;
+        this.onBattleStarted = onBattleStarted;
         grassEvents = new ArrayList<>();
         createEvents();
     }
@@ -25,7 +32,8 @@ public class EventHandler {
                 150,
                 100,
                 1,
-                monsterHandler.getAllMonsters()
+                monsterHandler.getAllMonsters(),
+                onBattleStarted
         );
 
         grass1.setPlayer(player);
