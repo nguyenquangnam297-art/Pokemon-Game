@@ -20,6 +20,23 @@ public class Inventory {
         slots.add(new InventorySlot(itemId, qty));
     }
 
+    public boolean removeItem(String itemId, int qty) {
+        if(itemId == null && qty <= 0) {
+            return false;
+        }
+        for(int i = 0; i < slots.size(); i++) {
+            InventorySlot slot = slots.get(i);
+            if(itemId.equals(slot.itemId) &&  slot.quantity >= qty) {
+                slot.quantity -= qty;
+                if(slot.quantity <= 0) {
+                    slots.remove(i);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean useItem(String itemId) {
         for (int i = 0; i < slots.size(); i++) {
             InventorySlot slot = slots.get(i);

@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import Entity.Monster;
 import Entity.MonsterHandler;
 import Entity.Player;
+import Event.ShopHandler;
 import Event.DialogueEvent;
+import Event.ShopEvent;
+import Main.GamePanel;
 import Main.KeyHandler;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -16,14 +19,20 @@ public class NPCHandler {
     private ArrayList<NPC> npcs;
     private Player player;
     private KeyHandler keyH;
+
+    GamePanel gp;
     public DialogueEvent dialogueEvent;
     private String currentDialogue = "";
     private MonsterHandler monsterHandler;
+    private ShopHandler shopHandler;
+    private ShopEvent shopEvent;
 
-    public NPCHandler(Player player, KeyHandler keyH, MonsterHandler monsterHandler) {
+     public NPCHandler(GamePanel gp, Player player, KeyHandler keyH2, MonsterHandler monsterHandler2, ShopHandler shopHandler) {
+        this.gp = gp;
         this.player = player;
-        this.keyH = keyH;
-        this.monsterHandler = monsterHandler;
+        this.keyH = keyH2;
+        this.monsterHandler = monsterHandler2;
+        this.shopHandler = shopHandler;
         this.npcs = new ArrayList<>();
         createNPCs();
     }
@@ -34,8 +43,16 @@ public class NPCHandler {
                 "Ban dang di dau?",
                 "Chuc ban mot ngay vui ve!"
         );
-        oldMan.x = 300;
-        oldMan.y = 300;
+        oldMan.speed = 2;
+
+        ArrayList<int[]> oldManPath = new ArrayList<>();
+        oldManPath.add(new int[]{2, 2});
+        oldManPath.add(new int[]{2, 4});
+        oldManPath.add(new int[]{4, 4});
+        oldManPath.add(new int[]{4, 2});
+
+        oldMan.setPath(oldManPath, 48, true);
+        oldMan.setMapId("/MapMatrix");
         npcs.add(oldMan);
         ShopNPC shopKeeper = new ShopNPC(
                 "Shop Keeper",
@@ -43,8 +60,9 @@ public class NPCHandler {
                 "Ban muon mua mot mon do nao do sao?",
                 "Hay xem thu cua hang cua toi!"
         );
-        shopKeeper.x = 500;
-        shopKeeper.y = 300;
+        shopKeeper.x = 900;
+        shopKeeper.y = 700;
+        shopKeeper.setMapId("/MapMatrix");
         npcs.add(shopKeeper);
         ArrayList<Monster> trainerMonsters =
                 monsterHandler.getAllMonsters();
@@ -56,29 +74,61 @@ public class NPCHandler {
                 "Ta da san sang cho tran dau!",
                 "Chuan bi di!"
         );
-        trainer.x = 700;
-        trainer.y = 300;
+
+        trainer.speed = 2;
+
+        ArrayList<int[]> trainerPath = new ArrayList<>();
+        trainerPath.add(new int[]{7, 10});
+        trainerPath.add(new int[]{7, 13});
+        trainerPath.add(new int[]{9, 14});
+        trainerPath.add(new int[]{9, 14});
+        trainerPath.add(new int[]{10, 12});
+        trainerPath.add(new int[]{9, 10});
+
+        trainer.setPath(trainerPath, 48, true);
+        trainer.setWaitDuration(180);
+        trainer.setMapId("/MapMatrix");
+
         npcs.add(trainer);
     }
-    private NPC getNearbyNPC() {
+    public NPC getNearbyNPC() {
+        String activeMap = gp.tileH.getCurrentMap();
         for (NPC npc : npcs) {
-            if (isPlayerNearNPC(npc)) {
+            if (npc.belongsToMap(activeMap) && isPlayerNearNPC(npc)) {
                 return npc;
             }
         }
-
         return null;
     }
 
+    public void updateShop() {
+        if (shopEvent == null) {
+            return;
+        }
+        shopHandler.update(keyH);
+        if (!shopHandler.isOpen()) {
+            shopEvent.endShop();
+            shopEvent = null;
+        }
+    }
+
     public void draw(GraphicsContext graphics, int tileSize) {
-        for(NPC npc : npcs) {
-            if (isPlayerNearNPC(npc)) {
+        String activeMap = gp.tileH.getCurrentMap();
+        for (NPC npc : npcs) {
+            if (!npc.belongsToMap(activeMap)) {
+                continue;
+            }
+
+            if (!npc.isMoving() && isPlayerNearNPC(npc)) {
                 updateNPCDirection(npc);
             }
-            npc.draw(graphics, tileSize);
+
+            npc.draw(graphics, tileSize, gp.screenWidth, gp.screenHeight, player.x, player.y);
         }
+
         drawDialogueBox(graphics);
     }
+
     private void drawDialogueText(GraphicsContext graphics) {
         int x = 40;
         int y = 495;
@@ -153,39 +203,56 @@ public class NPCHandler {
         }
     }
     public void update() {
-
-        if (keyH.fPressed) {
-
-            // Nếu đang trong hội thoại
-            if (dialogueEvent != null) {
-
-                currentDialogue = dialogueEvent.nextDialogue();
-
-                if (dialogueEvent.isCompleted()) {
-                    NPC npc = dialogueEvent.getNpc();
-                    dialogueEvent = null;
-                    currentDialogue = "";
-                    if (npc instanceof ShopNPC) {
-                        ((ShopNPC) npc).openShop();
-                    }
-                }
-
+        String activeMap = gp.tileH.getCurrentMap();
+        for (NPC npc : npcs) {
+            if (npc.belongsToMap(activeMap)) {
+                npc.updateMovement();
             }
+        }
 
-            // Nếu chưa có hội thoại
-            else {
+        if (!keyH.fPressed) return;
 
-                NPC npc = getNearbyNPC();
+        if (dialogueEvent != null) {
+            currentDialogue = dialogueEvent.nextDialogue();
 
-                if (npc != null) {
+            if (dialogueEvent.isCompleted()) {
+                NPC npc = dialogueEvent.getNpc();
+                dialogueEvent = null;
+                currentDialogue = "";
 
-                    dialogueEvent = new DialogueEvent(npc);
+                resumeAllNPCs();
 
-                    currentDialogue = dialogueEvent.startDialogue();
+                if (npc instanceof ShopNPC) {
+                    shopEvent = new ShopEvent((ShopNPC) npc, shopHandler);
+                    shopEvent.startShop();
                 }
             }
 
             keyH.fPressed = false;
+            return;
+        }
+
+        NPC npc = getNearbyNPC();
+
+        if (npc != null) {
+            pauseAllNPCs();
+            updateNPCDirection(npc);
+
+            dialogueEvent = new DialogueEvent(npc);
+            currentDialogue = dialogueEvent.startDialogue();
+
+            keyH.fPressed = false;
+        }
+    }
+    private void pauseAllNPCs() {
+        for (NPC npc : npcs) {
+            npc.pauseMovement();
+        }
+    }
+
+    private void resumeAllNPCs() {
+        for (NPC npc : npcs) {
+            npc.resumeMovement();
         }
     }
 }

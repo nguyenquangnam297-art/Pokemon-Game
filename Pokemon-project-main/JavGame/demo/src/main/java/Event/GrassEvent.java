@@ -14,6 +14,7 @@ public class GrassEvent extends Event {
     private int height;
     private double encounterRate;
     private ArrayList<Monster> wildMonsters;
+    private String mapId = "/MapMatrix";
 
     //Khai bao tam thoi, phai bo
     private int encounterCooldown = 0;
@@ -59,6 +60,22 @@ public class GrassEvent extends Event {
     public double getEncounterRate() {
         return encounterRate;
     }
+
+    public void setMapId(String mapId) {
+        if (mapId == null || mapId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Map ID cannot be empty");
+        }
+        this.mapId = mapId.startsWith("/") ? mapId : "/" + mapId;
+    }
+
+    public String getMapId() {
+        return mapId;
+    }
+
+    public boolean belongsToMap(String activeMapId) {
+        return mapId.equals(activeMapId);
+    }
+
     public boolean isPlayerInGrass(Player player) {
         if (player == null) {
             return false;

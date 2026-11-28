@@ -1,0 +1,28 @@
+Tile atlas catalogue:
+Each source image is split into 64x64 cells, numbered left-to-right and top-to-bottom.
+Tile ID = sheet start ID + row * column count + column.
+OverWorld.png is not included.
+
+world.png: IDs 0-209, 10 columns x 21 rows.
+indoor.png: IDs 210-299, 10 columns x 9 rows.
+coast.png: IDs 300-587, 24 columns x 12 rows.
+
+Map tile IDs:
+3 = tree / rocky wall (collision)
+11 = grassland dirt path (walkable)
+13 = fence / rocky boundary (collision)
+41 = grass (walkable)
+42 = crop field (walkable)
+116 = bridge (walkable)
+71 = flower / grass decoration (walkable)
+224 = house entrance on MapMatrix; building exit on indoor maps
+228 = shop door / entrance (walkable, opens MapMatrixShop)
+231 = house interior wall (collision)
+238 = shop wall (collision)
+251 = indoor floor (walkable, used by MapMatrixHouse and MapMatrixShop)
+325 = lake water (collision)
+328 = tall grass / encounter grass (walkable)
+331 = sand / arena border (walkable)
+
+To find a cell's ID, use its source image coordinates in pixels:
+ID = sheet start ID + (y / 64) * column count + (x / 64).

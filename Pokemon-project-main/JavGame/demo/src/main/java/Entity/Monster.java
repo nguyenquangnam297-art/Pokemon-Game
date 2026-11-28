@@ -23,8 +23,7 @@ public class Monster {
         this.speed = speed;
         this.imagePath = imagePath;
         
-        // Mặc định luôn có đòn đánh thường
-        this.addSkill(new Skill("Tackle", 40, "NORMAL"));
+        // Chiêu thức được khai báo cụ thể trong MonsterHandler.
     }
 
     public void addSkill(Skill move) {
@@ -83,7 +82,19 @@ public class Monster {
         Monster copy = new Monster(name, type, maxHp, attack, defense, speed, imagePath);
         copy.moves.clear();
         for (Skill skill : moves) {
-            copy.addSkill(new Skill(skill.getName(), skill.getBasePower(), skill.getType()));
+            copy.addSkill(new Skill(skill.getName(), skill.getBasePower(), skill.getType(), skill.isRanged()));
+        }
+        return copy;
+    }
+    
+    public Monster copyForBattle(double statMultiplier) {
+        int scaledHp = (int) Math.round(maxHp * statMultiplier);
+        int scaledAttack = (int) Math.round(attack * statMultiplier);
+        int scaledDefense = (int) Math.round(defense * statMultiplier);
+        Monster copy = new Monster(name, type, scaledHp, scaledAttack, scaledDefense, speed, imagePath);
+        copy.moves.clear();
+        for (Skill skill : moves) {
+            copy.addSkill(new Skill(skill.getName(), skill.getBasePower(), skill.getType(), skill.isRanged()));
         }
         return copy;
     }

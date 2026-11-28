@@ -8,7 +8,7 @@ public class DamageCalculator {
             return 0;
         }
         int actualAtk = attacker.getAttack();
-        // Áp dụng Buff Tấn công (tăng 20% sát thương)
+
         if (attacker.getAtkBuffTurns() > 0) {
             actualAtk = (int) (actualAtk * 1.2);
         }
@@ -23,7 +23,7 @@ public class DamageCalculator {
         double delta = actualAtk - actualDef;
         double c = 50.0;
         double multiplier = 0.0;
-        // Đã thay thế toán tử 3 ngôi (? :) bằng if-else
+
         if (delta >= 0) {
             multiplier = 1.0 + (delta / (delta + c)) * 2.0;
         } else {

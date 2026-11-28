@@ -8,9 +8,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-/**
- * Component hiển thị danh sách dự đoán lượt.
- */
 public class TurnOrderView extends VBox {
 
     public TurnOrderView() {
@@ -20,43 +17,62 @@ public class TurnOrderView extends VBox {
 
     public void update(Monster[] upcoming, Monster p2) {
         this.getChildren().clear();
-        
+
         Label title = new Label("Thứ tự lượt:");
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333;");
+        title.setStyle(
+            "-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #ffffff; "
+            + "-fx-background-color: rgba(20, 25, 35, 0.75); -fx-padding: 4 10 4 10; -fx-background-radius: 0;"
+        );
         this.getChildren().add(title);
 
         for (int i = 0; i < upcoming.length; i++) {
             ImageView img = new ImageView();
             try {
-                img.setImage(new Image(getClass().getResourceAsStream(upcoming[i].getImagePath())));
+                Image rawImg = new Image(getClass().getResourceAsStream(upcoming[i].getImagePath()));
+                MonsterSpriteHelper.applyStaticFrame(img, rawImg);
             } catch (Exception e) {}
+
+            boolean isEnemy = (upcoming[i] == p2);
+
+            String bgColor;
+            if (isEnemy) {
+                bgColor = "#ef5350"; // Nền đỏ cho quái địch
+            } else {
+                bgColor = "#42a5f5"; // Nền xanh cho quái bản thân
+            }
 
             int size;
             String borderColor;
             String borderWidth;
-            
+
             if (i == 0) {
-                size = 70;
-                borderColor = "#cc0000"; 
+                size = 53;
+                borderColor = "#ffd54f"; // Viền vàng nổi bật cho lượt hiện tại
                 borderWidth = "3";
             } else {
-                size = 45;
-                borderColor = "#aaaaaa"; 
-                borderWidth = "1";
+                size = 53;
+                if (isEnemy) {
+                    borderColor = "#b71c1c";
+                } else {
+                    borderColor = "#0d47a1";
+                }
+                borderWidth = "2";
             }
-            
+
             img.setFitHeight(size);
-            img.setFitWidth(size); 
-            
-            if (upcoming[i] == p2) {
-                img.setScaleX(-1); 
+            img.setFitWidth(size);
+            img.setPreserveRatio(true);
+
+            if (isEnemy) {
+                img.setScaleX(-1);
             }
-            
+
             StackPane frame = new StackPane(img);
-            frame.setStyle("-fx-border-color: " + borderColor + 
-                           "; -fx-border-width: " + borderWidth + 
-                           "; -fx-background-color: white; -fx-padding: 3; -fx-background-radius: 5; -fx-border-radius: 5;");
-            
+            frame.setStyle("-fx-border-color: " + borderColor
+                + "; -fx-border-width: " + borderWidth
+                + "; -fx-background-color: " + bgColor
+                + "; -fx-padding: 3; -fx-background-radius: 0; -fx-border-radius: 0;");
+
             this.getChildren().add(frame);
         }
     }

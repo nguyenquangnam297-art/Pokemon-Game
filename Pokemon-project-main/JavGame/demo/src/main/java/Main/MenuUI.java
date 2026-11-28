@@ -133,10 +133,10 @@ public class MenuUI {
     }
 
     private void drawMainMenu(GraphicsContext gc) {
-        int x = gp.tileSize * 9;
-        int y = gp.tileSize;
         int width = gp.tileSize * 6;
         int height = gp.tileSize * 5;
+        int x = Math.max(0, gp.screenWidth - width - gp.tileSize);
+        int y = gp.tileSize;
         drawSubWindow(gc, x, y, width, height);
 
         x += gp.tileSize / 2;

@@ -4,9 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
-/*
-Thông báo trận đấu.
- */
+
 public class NotificationPopup extends HBox {
     private Label popupLabel;
 
@@ -17,13 +15,13 @@ public class NotificationPopup extends HBox {
                           + "-fx-font-size: 18px; "
                           + "-fx-font-weight: bold; "
                           + "-fx-padding: 15 30; "
-                          + "-fx-background-radius: 20; "
+                          + "-fx-background-radius: 0; "
                           + "-fx-text-alignment: center;");
         popupLabel.setAlignment(Pos.CENTER);
 
         this.getChildren().add(popupLabel);
         this.setAlignment(Pos.CENTER);
-        this.setMouseTransparent(true); // Không chặn nhấp chuột
+        this.setMouseTransparent(true);
     }
 
     public void showMessage(String message) {
